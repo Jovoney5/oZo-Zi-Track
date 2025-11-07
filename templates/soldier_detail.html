@@ -264,7 +264,15 @@
 </head>
 <body>
     <div class="header">
-        <a href="/" class="back-btn">← Back to Dashboard</a>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <a href="/dashboard" class="back-btn">← Back to Dashboard</a>
+            <div>
+                {% if user.role == 'Commander' %}
+                    <a href="/commander" class="back-btn" style="margin-right: 15px;">Commander View</a>
+                {% endif %}
+                <a href="/logout" class="back-btn" style="border-color: #ff0044; color: #ff0044;">🚪 Logout</a>
+            </div>
+        </div>
     </div>
 
     <div class="container">

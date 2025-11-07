@@ -208,8 +208,11 @@
     <div class="header">
         <h1>➕ Add New Soldier</h1>
         <div class="nav-menu">
-            <a href="{{ url_for('commander') }}">← Back to Commander</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            {% if current_user.role == 'Commander' %}
+                <a href="{{ url_for('commander') }}">Commander View</a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}" style="color: #ff0044; border-color: #ff0044;">🚪 Logout</a>
         </div>
     </div>
 

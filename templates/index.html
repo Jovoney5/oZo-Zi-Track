@@ -348,9 +348,16 @@
         <span class="logo"></span>
         <h1> Fitness Command</h1>
         <div class="nav-menu">
-            <a href="/">Dashboard</a>
-            <a href="/commander">Commander View</a>
-            <a href="/analytics">Analytics</a>
+            <a href="/dashboard">Dashboard</a>
+            {% if user.role == 'Commander' %}
+                <a href="/commander">Commander View</a>
+                <a href="/analytics">Analytics</a>
+                <a href="/add-soldier">➕ Add Soldier</a>
+            {% elif user.role == 'Sergeant' %}
+                <a href="/analytics">Analytics</a>
+                <a href="/add-soldier">➕ Add Soldier</a>
+            {% endif %}
+            <a href="/logout" style="color: #ff0044; border-color: #ff0044;">🚪 Logout</a>
         </div>
     </div>
 

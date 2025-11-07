@@ -373,10 +373,8 @@ def logout():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    if current_user.role == 'Commander':
-        return redirect(url_for('commander'))
-    else:
-        return render_template('index.html', user=current_user)
+    # Each role gets their own dashboard view
+    return render_template('index.html', user=current_user)
 
 
 @app.route('/commander')
