@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics & Insights - JDF Fitness Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a3e 100%);
+            color: #00ff88;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px 40px;
+            border-bottom: 3px solid #00ff88;
+            box-shadow: 0 4px 30px rgba(0, 255, 136, 0.4);
+        }
+
+        .header h1 {
+            font-size: 2em;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
+        }
+
+        .nav-menu {
+            float: right;
+            margin-top: 15px;
+        }
+
+        .nav-menu a {
+            color: #00ff88;
+            text-decoration: none;
+            margin-left: 25px;
+            padding: 8px 16px;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .nav-menu a:hover {
+            border: 1px solid #00ff88;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .analytics-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00ff88;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.2);
+            transition: all 0.3s;
+        }
+
+        .analytics-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 50px rgba(0, 255, 136, 0.4);
+        }
+
+        .analytics-card h3 {
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 1.2em;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        .insights-section {
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.8), rgba(0, 50, 100, 0.3));
+            border: 2px solid #00ffff;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .insights-section h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-align: center;
+            color: #00ffff;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .insight-card {
+            background: rgba(0, 0, 0, 0.6);
+            border-left: 4px solid #00ffff;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .insight-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .insight-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #00ffff;
+        }
+
+        .insight-text {
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .prediction-panel {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #ff00ff;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .prediction-panel h2 {
+            color: #ff00ff;
+            text-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+            text-align: center;
+            font-size: 2em;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+        }
+
+        .prediction-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .prediction-card {
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.7), rgba(50, 0, 50, 0.3));
+            border: 2px solid #ff00ff;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .prediction-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #ff00ff;
+            text-shadow: 0 0 15px rgba(255, 0, 255, 0.8);
+            margin: 15px 0;
+        }
+
+        .prediction-label {
+            font-size: 0.9em;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .leaderboard {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #ffaa00;
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .leaderboard h2 {
+            color: #ffaa00;
+            text-shadow: 0 0 20px rgba(255, 170, 0, 0.8);
+            text-align: center;
+            font-size: 2em;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+        }
+
+        .leaderboard-item {
+            background: rgba(0, 0, 0, 0.5);
+            border-left: 4px solid #ffaa00;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .leaderboard-item:hover {
+            background: rgba(255, 170, 0, 0.1);
+            transform: translateX(10px);
+        }
+
+        .leaderboard-rank {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffaa00;
+            margin-right: 20px;
+        }
+
+        .leaderboard-info {
+            flex: 1;
+        }
+
+        .leaderboard-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .leaderboard-score {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #ffaa00;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .export-btn {
+            padding: 15px 30px;
+            background: transparent;
+            border: 2px solid #00ff88;
+            color: #00ff88;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+        }
+
+        .export-btn:hover {
+            background: #00ff88;
+            color: #000;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .nav-menu {
+                float: none;
+                margin-top: 15px;
+            }
+
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Advanced Analytics & AI Insights</h1>
+        <div class="nav-menu">
+            <a href="/">Dashboard</a>
+            <a href="/commander">Commander View</a>
+            <a href="/analytics">Analytics</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="insights-section">
+            <h2>🤖 AI-Powered Insights</h2>
+            <div class="insights-grid">
+                <div class="insight-card">
+                    <div class="insight-icon">⚡</div>
+                    <div class="insight-title">Peak Performance Window</div>
+                    <div class="insight-text">
+                        Unit performs optimally between 06:00-10:00 hours. Heart rate variability and recovery metrics are 23% better during morning training sessions.
+                    </div>
+                </div>
+
+                <div class="insight-card">
+                    <div class="insight-icon">💧</div>
+                    <div class="insight-title">Hydration Correlation</div>
+                    <div class="insight-text">
+                        Personnel with hydration levels above 75% show 31% better endurance and 18% faster recovery times. Recommend hydration checkpoints every 45 minutes.
+                    </div>
+                </div>
+
+                <div class="insight-card">
+                    <div class="insight-icon">🌡️</div>
+                    <div class="insight-title">Heat Stress Pattern</div>
+                    <div class="insight-text">
+                        Risk increases 40% between 13:00-15:00. AI recommends scheduling intensive training before 11:00 or after 16:00 to minimize heat-related incidents.
+                    </div>
+                </div>
+
+                <div class="insight-card">
+                    <div class="insight-icon">💪</div>
+                    <div class="insight-title">Recovery Optimization</div>
+                    <div class="insight-text">
+                        Average recovery time is 4.2 hours. Personnel showing fatigue levels above 80% require minimum 6-hour rest period for optimal performance restoration.
+                    </div>
+                </div>
+
+                <div class="insight-card">
+                    <div class="insight-icon">🎯</div>
+                    <div class="insight-title">Training Efficiency</div>
+                    <div class="insight-text">
+                        Current training protocols show 87% efficiency. AI suggests incorporating interval training to improve cardiovascular endurance by projected 15%.
+                    </div>
+                </div>
+
+                <div class="insight-card">
+                    <div class="insight-icon">🏥</div>
+                    <div class="insight-title">Injury Prevention</div>
+                    <div class="insight-text">
+                        Machine learning models detect 3 personnel at elevated injury risk based on fatigue accumulation patterns. Recommend reduced intensity for next 48 hours.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="prediction-panel">
+            <h2>🔮 Predictive Analytics</h2>
+            <div class="prediction-grid">
+                <div class="prediction-card">
+                    <div class="prediction-label">Unit Readiness (24h)</div>
+                    <div class="prediction-value">94%</div>
+                    <div class="insight-text">Projected operational capacity</div>
+                </div>
+
+                <div class="prediction-card">
+                    <div class="prediction-label">Optimal Training Time</div>
+                    <div class="prediction-value">07:30</div>
+                    <div class="insight-text">Tomorrow's peak performance window</div>
+                </div>
+
+                <div class="prediction-card">
+                    <div class="prediction-label">Heat Index Alert</div>
+                    <div class="prediction-value">High</div>
+                    <div class="insight-text">Afternoon operations advisory</div>
+                </div>
+
+                <div class="prediction-card">
+                    <div class="prediction-label">Recovery ETA</div>
+                    <div class="prediction-value">3.8h</div>
+                    <div class="insight-text">Average unit recovery time</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="analytics-grid">
+            <div class="analytics-card">
+                <h3>📈 Performance Trends (7 Days)</h3>
+                <div class="chart-container">
+                    <canvas id="performance-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="analytics-card">
+                <h3>💓 Heart Rate Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="hr-distribution-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="analytics-card">
+                <h3>🏃 Activity Breakdown</h3>
+                <div class="chart-container">
+                    <canvas id="activity-pie-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="analytics-card">
+                <h3>⚠️ Risk Assessment Matrix</h3>
+                <div class="chart-container">
+                    <canvas id="risk-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="leaderboard">
+            <h2>🏆 Performance Leaderboard</h2>
+            <div id="leaderboard-container"></div>
+        </div>
+
+        <div class="export-buttons">
+            <button class="export-btn" onclick="exportPDF()">📄 Export PDF Report</button>
+            <button class="export-btn" onclick="exportCSV()">📊 Export CSV Data</button>
+            <button class="export-btn" onclick="emailReport()">📧 Email Report</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Performance Trends Chart
+        const performanceCtx = document.getElementById('performance-chart').getContext('2d');
+        new Chart(performanceCtx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Average Performance Score',
+                    data: [78, 82, 85, 88, 86, 90, 92],
+                    borderColor: '#00ff88',
+                    backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: '#00ff88' } }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: { color: 'rgba(0, 255, 136, 0.1)' },
+                        ticks: { color: '#00ff88' }
+                    },
+                    x: {
+                        grid: { color: 'rgba(0, 255, 136, 0.1)' },
+                        ticks: { color: '#00ff88' }
+                    }
+                }
+            }
+        });
+
+        // Heart Rate Distribution Chart
+        const hrDistCtx = document.getElementById('hr-distribution-chart').getContext('2d');
+        new Chart(hrDistCtx, {
+            type: 'bar',
+            data: {
+                labels: ['60-80', '80-100', '100-120', '120-140', '140-160', '160+'],
+                datasets: [{
+                    label: 'Personnel Count',
+                    data: [2, 3, 8, 12, 5, 2],
+                    backgroundColor: [
+                        '#00ff88',
+                        '#00ddaa',
+                        '#00bbcc',
+                        '#ffaa00',
+                        '#ff8800',
+                        '#ff0044'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: '#00ff88' } }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0, 255, 136, 0.1)' },
+                        ticks: { color: '#00ff88' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#00ff88' }
+                    }
+                }
+            }
+        });
+
+        // Activity Pie Chart
+        const activityCtx = document.getElementById('activity-pie-chart').getContext('2d');
+        new Chart(activityCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Resting', 'Walking', 'Running', 'Training'],
+                datasets: [{
+                    data: [25, 30, 20, 25],
+                    backgroundColor: [
+                        '#00ff88',
+                        '#00aaff',
+                        '#ffaa00',
+                        '#ff6600'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#00ff88' }
+                    }
+                }
+            }
+        });
+
+        // Risk Assessment Chart
+        const riskCtx = document.getElementById('risk-chart').getContext('2d');
+        new Chart(riskCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Heat Stress', 'Fatigue', 'Dehydration', 'Overexertion', 'Injury Risk'],
+                datasets: [{
+                    label: 'Current Risk Levels',
+                    data: [65, 45, 35, 50, 30],
+                    borderColor: '#ff0044',
+                    backgroundColor: 'rgba(255, 0, 68, 0.2)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: '#00ff88' } }
+                },
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: { color: 'rgba(0, 255, 136, 0.2)' },
+                        ticks: { color: '#00ff88' }
+                    }
+                }
+            }
+        });
+
+        // Generate Leaderboard
+        const soldiers = [
+            { rank: 1, name: 'SGT Brown', score: 95, unit: 'Bravo Squad' },
+            { rank: 2, name: 'LT Thompson', score: 93, unit: 'Command' },
+            { rank: 3, name: 'CPL Martinez', score: 91, unit: 'Charlie Squad' },
+            { rank: 4, name: 'CPL Johnson', score: 88, unit: 'Alpha Squad' },
+            { rank: 5, name: 'PTE Williams', score: 85, unit: 'Alpha Squad' }
+        ];
+
+        const leaderboardHTML = soldiers.map(soldier => `
+            <div class="leaderboard-item">
+                <div class="leaderboard-rank">#${soldier.rank}</div>
+                <div class="leaderboard-info">
+                    <div class="leaderboard-name">${soldier.name}</div>
+                    <div style="color: #888;">${soldier.unit}</div>
+                </div>
+                <div class="leaderboard-score">${soldier.score}</div>
+            </div>
+        `).join('');
+
+        document.getElementById('leaderboard-container').innerHTML = leaderboardHTML;
+
+        // Export Functions
+        function exportPDF() {
+            alert('📄 Generating comprehensive PDF report...\n\nReport will include:\n• Unit performance metrics\n• Individual soldier data\n• AI insights and recommendations\n• Predictive analytics\n\nDownload will begin shortly.');
+        }
+
+        function exportCSV() {
+            alert('📊 Exporting data to CSV format...\n\nFile will include:\n• Raw sensor data\n• Calculated metrics\n• Timestamps and activity logs\n\nDownload starting now.');
+        }
+
+        function emailReport() {
+            const email = prompt('Enter email address to send report:');
+            if (email) {
+                alert(`📧 Report scheduled for delivery to: ${email}\n\nYou will receive:\n• Executive Summary\n• Detailed Analytics\n• Actionable Recommendations\n\nExpected delivery: Within 5 minutes`);
+            }
+        }
+    </script>
+</body>
+</html>

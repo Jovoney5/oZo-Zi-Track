@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commander Tactical View - JDF Fitness Tracker</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a3e 100%);
+            color: #00ff88;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px 40px;
+            border-bottom: 3px solid #00ff88;
+            box-shadow: 0 4px 30px rgba(0, 255, 136, 0.4);
+        }
+
+        .header h1 {
+            font-size: 2em;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
+        }
+
+        .nav-menu {
+            float: right;
+            margin-top: 15px;
+        }
+
+        .nav-menu a {
+            color: #00ff88;
+            text-decoration: none;
+            margin-left: 25px;
+            padding: 8px 16px;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .nav-menu a:hover {
+            border: 1px solid #00ff88;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .tactical-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .map-container {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00ff88;
+            border-radius: 15px;
+            padding: 20px;
+            min-height: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-container h2 {
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #map {
+            width: 100%;
+            height: 450px;
+            border-radius: 10px;
+            border: 1px solid #00ff88;
+            z-index: 1;
+        }
+
+        /* Custom marker styles */
+        .soldier-marker {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 3px solid #00ff88;
+            background: rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
+            animation: markerPulse 2s infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #00ff88;
+            font-size: 12px;
+        }
+
+        .soldier-marker.alert {
+            border-color: #ff0044;
+            background: rgba(255, 0, 68, 0.3);
+            box-shadow: 0 0 20px rgba(255, 0, 68, 0.8);
+            color: #ff0044;
+        }
+
+        .soldier-marker.warning {
+            border-color: #ffaa00;
+            background: rgba(255, 170, 0, 0.3);
+            box-shadow: 0 0 20px rgba(255, 170, 0, 0.8);
+            color: #ffaa00;
+        }
+
+        @keyframes markerPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.8); }
+            50% { box-shadow: 0 0 40px rgba(0, 255, 136, 1); }
+        }
+
+        /* Leaflet popup custom styling */
+        .leaflet-popup-content-wrapper {
+            background: rgba(0, 0, 0, 0.9);
+            color: #00ff88;
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+        }
+
+        .leaflet-popup-content {
+            margin: 15px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .leaflet-popup-tip {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .popup-soldier-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .popup-stat {
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+
+        .stats-panel {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00ff88;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .stats-panel h2 {
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .stat-item {
+            background: rgba(0, 255, 136, 0.1);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #00ff88;
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-top: 5px;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.6);
+        }
+
+        .stat-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00ffff);
+            transition: width 0.5s;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
+        }
+
+        .units-section {
+            margin-top: 30px;
+        }
+
+        .units-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .unit-card {
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.8), rgba(0, 50, 30, 0.3));
+            border: 2px solid #00ff88;
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s;
+        }
+
+        .unit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0, 255, 136, 0.4);
+        }
+
+        .unit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .unit-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .unit-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .status-ready {
+            background: rgba(0, 255, 136, 0.3);
+            border: 1px solid #00ff88;
+        }
+
+        .status-alert {
+            background: rgba(255, 170, 0, 0.3);
+            border: 1px solid #ffaa00;
+            color: #ffaa00;
+        }
+
+        .unit-personnel {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .personnel-item {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+
+        .critical-alerts {
+            background: rgba(255, 0, 68, 0.1);
+            border: 2px solid #ff0044;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .critical-alerts h3 {
+            color: #ff0044;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            animation: alertBlink 1.5s infinite;
+        }
+
+        @keyframes alertBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .alert-item {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #ff0044;
+        }
+
+        .command-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .cmd-button {
+            flex: 1;
+            padding: 15px;
+            background: transparent;
+            border: 2px solid #00ff88;
+            color: #00ff88;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+        }
+
+        .cmd-button:hover {
+            background: #00ff88;
+            color: #000;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.6);
+        }
+
+        .cmd-button.danger {
+            border-color: #ff0044;
+            color: #ff0044;
+        }
+
+        .cmd-button.danger:hover {
+            background: #ff0044;
+            color: #fff;
+            box-shadow: 0 0 30px rgba(255, 0, 68, 0.6);
+        }
+
+        @media (max-width: 1200px) {
+            .tactical-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .nav-menu {
+                float: none;
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎯 JDF Commander Tactical Control</h1>
+        <div class="nav-menu">
+            <a href="/">Dashboard</a>
+            <a href="/commander">Commander View</a>
+            <a href="/analytics">Analytics</a>
+            <a href="/add-soldier">➕ Add Soldier</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="critical-alerts-container"></div>
+
+        <div class="tactical-grid">
+            <div class="map-container">
+                <h2>📍 Live Personnel Locations</h2>
+                <div id="map"></div>
+            </div>
+
+            <div class="stats-panel">
+                <h2>⚡ Real-Time Stats</h2>
+
+                <div class="stat-item">
+                    <div class="stat-label">Unit Readiness</div>
+                    <div class="stat-value" id="readiness-value">--</div>
+                    <div class="stat-bar">
+                        <div class="stat-bar-fill" id="readiness-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-label">Average Heart Rate</div>
+                    <div class="stat-value" id="avg-hr-value">-- BPM</div>
+                    <div class="stat-bar">
+                        <div class="stat-bar-fill" id="hr-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-label">Hydration Level</div>
+                    <div class="stat-value" id="hydration-value">--</div>
+                    <div class="stat-bar">
+                        <div class="stat-bar-fill" id="hydration-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-label">Active Personnel</div>
+                    <div class="stat-value" id="active-count">-- / 8</div>
+                </div>
+
+                <div class="command-buttons">
+                    <button class="cmd-button" onclick="refreshData()">🔄 REFRESH</button>
+                    <button class="cmd-button danger" onclick="emergencyProtocol()">🚨 EMERGENCY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="units-section">
+            <h2 style="font-size: 2em; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 3px;">
+                Squad Status Overview
+            </h2>
+            <div class="units-grid" id="units-container"></div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+        let soldiersData = {};
+        let soldierMarkers = {};  // Store Leaflet marker objects
+        let map = null;  // Leaflet map object
+        let units = {
+            'Alpha Squad': [],
+            'Bravo Squad': [],
+            'Charlie Squad': [],
+            'Command': []
+        };
+
+        // Initialize Leaflet map centered on Jamaica (showing entire island)
+        function initMap() {
+            // Center on Jamaica, zoom level to show entire island
+            map = L.map('map').setView([18.1096, -77.2975], 9);
+
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19,
+                minZoom: 8
+            }).addTo(map);
+
+            console.log('Map initialized - showing all of Jamaica');
+        }
+
+        socket.on('connect', function() {
+            console.log('Connected to command server');
+            initMap();  // Initialize map first
+            socket.emit('start_monitoring');
+            loadData();
+        });
+
+        async function loadData() {
+            try {
+                const response = await fetch('/api/soldiers');
+                const soldiers = await response.json();
+
+                // Organize by unit
+                soldiers.forEach(soldier => {
+                    if (!units[soldier.unit]) units[soldier.unit] = [];
+                    units[soldier.unit].push(soldier);
+                });
+
+                renderUnits();
+                updateMap();
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+
+        socket.on('vitals_update', function(data) {
+            soldiersData[data.id] = data;
+            updateStats();
+            updateMap();
+            checkAlerts(data);
+        });
+
+        function renderUnits() {
+            const container = document.getElementById('units-container');
+            container.innerHTML = Object.keys(units).map(unitName => {
+                const personnel = units[unitName];
+                const avgHR = Math.floor(Math.random() * 40) + 80;
+                const status = avgHR > 110 ? 'alert' : 'ready';
+
+                return `
+                    <div class="unit-card">
+                        <div class="unit-header">
+                            <div class="unit-name">${unitName}</div>
+                            <div class="unit-status status-${status}">
+                                ${status === 'ready' ? '✓ READY' : '⚠ ALERT'}
+                            </div>
+                        </div>
+                        <div><strong>Personnel:</strong> ${personnel.length}</div>
+                        <div><strong>Avg Heart Rate:</strong> <span id="unit-hr-${unitName.replace(' ', '-')}">${avgHR}</span> BPM</div>
+                        <div><strong>Status:</strong> ${status === 'ready' ? 'All systems normal' : 'Attention required'}</div>
+                        <div class="unit-personnel">
+                            ${personnel.map(p => `
+                                <div class="personnel-item">
+                                    ${p.rank} ${p.name.split(' ')[1]}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateMap() {
+            if (!map) return;
+
+            // Update or create markers for each soldier
+            Object.values(soldiersData).forEach((soldier) => {
+                if (soldier.location && soldier.location.lat && soldier.location.lng) {
+                    const lat = soldier.location.lat;
+                    const lng = soldier.location.lng;
+
+                    // Determine marker status class
+                    let statusClass = '';
+                    if (soldier.heart_rate > 150) {
+                        statusClass = 'alert';
+                    } else if (soldier.heart_rate > 120) {
+                        statusClass = 'warning';
+                    }
+
+                    // Create custom marker HTML
+                    const markerHtml = `<div class="soldier-marker ${statusClass}">${soldier.id}</div>`;
+
+                    // Create popup content
+                    const popupContent = `
+                        <div class="popup-soldier-name">${soldier.name}</div>
+                        <div class="popup-stat"><strong>Rank:</strong> ${soldier.rank}</div>
+                        <div class="popup-stat"><strong>Unit:</strong> ${soldier.unit}</div>
+                        <div class="popup-stat"><strong>Activity:</strong> ${soldier.activity}</div>
+                        <div class="popup-stat"><strong>Heart Rate:</strong> ${soldier.heart_rate} BPM</div>
+                        <div class="popup-stat"><strong>Body Temp:</strong> ${soldier.body_temp}°C</div>
+                        <div class="popup-stat"><strong>Hydration:</strong> ${soldier.hydration}%</div>
+                        <div class="popup-stat"><strong>Stress:</strong> ${soldier.stress_level}%</div>
+                    `;
+
+                    // If marker already exists, update its position
+                    if (soldierMarkers[soldier.id]) {
+                        soldierMarkers[soldier.id].setLatLng([lat, lng]);
+                        soldierMarkers[soldier.id].setPopupContent(popupContent);
+
+                        // Update marker icon
+                        const icon = L.divIcon({
+                            className: 'custom-div-icon',
+                            html: markerHtml,
+                            iconSize: [30, 30],
+                            iconAnchor: [15, 15]
+                        });
+                        soldierMarkers[soldier.id].setIcon(icon);
+                    } else {
+                        // Create new marker
+                        const icon = L.divIcon({
+                            className: 'custom-div-icon',
+                            html: markerHtml,
+                            iconSize: [30, 30],
+                            iconAnchor: [15, 15]
+                        });
+
+                        const marker = L.marker([lat, lng], { icon: icon })
+                            .addTo(map)
+                            .bindPopup(popupContent);
+
+                        soldierMarkers[soldier.id] = marker;
+                    }
+                }
+            });
+        }
+
+        function updateStats() {
+            const soldiers = Object.values(soldiersData);
+            if (soldiers.length === 0) return;
+
+            // Calculate averages
+            const avgHR = Math.round(soldiers.reduce((sum, s) => sum + s.heart_rate, 0) / soldiers.length);
+            const avgHydration = Math.round(soldiers.reduce((sum, s) => sum + s.hydration, 0) / soldiers.length);
+            const avgStress = Math.round(soldiers.reduce((sum, s) => sum + s.stress_level, 0) / soldiers.length);
+            const readiness = 100 - avgStress;
+            const activeSoldiers = soldiers.filter(s => s.activity !== 'resting').length;
+
+            // Update display
+            document.getElementById('readiness-value').textContent = readiness + '%';
+            document.getElementById('readiness-bar').style.width = readiness + '%';
+
+            document.getElementById('avg-hr-value').textContent = avgHR + ' BPM';
+            document.getElementById('hr-bar').style.width = Math.min((avgHR / 200) * 100, 100) + '%';
+
+            document.getElementById('hydration-value').textContent = avgHydration + '%';
+            document.getElementById('hydration-bar').style.width = avgHydration + '%';
+
+            document.getElementById('active-count').textContent = activeSoldiers + ' / ' + soldiers.length;
+        }
+
+        function checkAlerts(soldier) {
+            const alertsContainer = document.getElementById('critical-alerts-container');
+
+            // Check for critical conditions
+            const alerts = [];
+
+            if (soldier.heart_rate > 170) {
+                alerts.push(`${soldier.name}: Critical heart rate - ${soldier.heart_rate} BPM`);
+            }
+            if (soldier.body_temp > 38.5) {
+                alerts.push(`${soldier.name}: High body temperature - ${soldier.body_temp}°C`);
+            }
+            if (soldier.hydration < 50) {
+                alerts.push(`${soldier.name}: Low hydration - ${soldier.hydration}%`);
+            }
+
+            if (alerts.length > 0) {
+                alertsContainer.innerHTML = `
+                    <div class="critical-alerts">
+                        <h3>⚠️ CRITICAL ALERTS</h3>
+                        ${alerts.map(alert => `<div class="alert-item">${alert}</div>`).join('')}
+                    </div>
+                `;
+            }
+        }
+
+        function refreshData() {
+            loadData();
+            alert('Data refreshed successfully!');
+        }
+
+        function emergencyProtocol() {
+            if (confirm('Activate Emergency Protocol?\n\nThis will alert all personnel and command staff.')) {
+                alert('🚨 EMERGENCY PROTOCOL ACTIVATED\n\nAll units have been notified.\nMedical teams dispatched.\nCommand staff alerted.');
+            }
+        }
+
+        // Auto-refresh stats every 10 seconds (socket handles real-time updates)
+        setInterval(() => {
+            updateStats();
+        }, 10000);
+    </script>
+</body>
+</html>
