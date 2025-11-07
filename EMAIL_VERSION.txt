@@ -1,0 +1,52 @@
+Subject: JDF Fitness Tracker Demo - Ready for Testing
+
+Dear Officer,
+
+The JDF Military Fitness Tracker prototype is ready for your review.
+
+Website: [YOUR RENDER URL]
+
+LOGIN:
+Username: commander
+Password: secure!123
+
+WHAT TO TEST:
+
+1. VIEW LIVE MAP
+   - See all soldiers on Jamaica map
+   - Click dots for soldier details
+   - Watch them move in real-time
+
+2. VIEW ANALYTICS
+   - Click "Analytics" at top
+   - See performance insights
+
+3. ADD NEW SOLDIER
+   - Click "➕ Add Soldier"
+   - Fill form and get GPS location
+   - New soldier appears on map instantly
+
+4. VIEW SOLDIER DETAILS
+   - Go to Dashboard
+   - Click "View Full Details" on any soldier
+   - See real-time vitals
+
+5. TRY OTHER LOGINS
+   - Logout (red button top right)
+   - Try: sergeant / secure!456
+   - Try: corporal / secure!789
+   - Each role has different access
+
+KEY FEATURES:
+✓ Live GPS tracking across Jamaica
+✓ Real-time health monitoring
+✓ Role-based security access
+✓ Add soldiers with GPS capture
+✓ Works on mobile devices
+
+NOTE: First load may take 30 seconds (free hosting)
+
+Let me know if you have any questions.
+
+Best regards,
+[Your Name]
