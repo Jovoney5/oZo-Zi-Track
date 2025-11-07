@@ -48,9 +48,9 @@ def init_db():
     if c.fetchone()[0] == 0:
         # Add default users
         default_users = [
-            ('commander', generate_password_hash('commander123'), 'Commander', 'Commander Smith'),
-            ('sergeant', generate_password_hash('sergeant123'), 'Sergeant', 'Sergeant Johnson'),
-            ('corporal', generate_password_hash('corporal123'), 'Corporal', 'Corporal Brown'),
+            ('commander', generate_password_hash('secure!123'), 'Commander', 'Commander Smith'),
+            ('sergeant', generate_password_hash('secure!456'), 'Sergeant', 'Sergeant Johnson'),
+            ('corporal', generate_password_hash('secure!789'), 'Corporal', 'Corporal Brown'),
         ]
         c.executemany('INSERT INTO users (username, password, role, name) VALUES (?, ?, ?, ?)', default_users)
 

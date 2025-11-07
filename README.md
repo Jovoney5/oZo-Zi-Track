@@ -14,9 +14,9 @@ A real-time GPS tracking and fitness monitoring system for Jamaica Defence Force
 
 ## Demo Credentials
 
-- **Commander**: `commander` / `commander123`
-- **Sergeant**: `sergeant` / `sergeant123`
-- **Corporal**: `corporal` / `corporal123`
+- **Commander**: `commander` / `secure!123`
+- **Sergeant**: `sergeant` / `secure!456`
+- **Corporal**: `corporal` / `secure!789`
 
 ## Local Development
 
