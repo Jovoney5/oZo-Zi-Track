@@ -3,7 +3,10 @@
     "allow": [
       "Read(//Users/jovoneybrown/PycharmProjects/**)",
       "Bash(test:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(git commit:*)",
+      "Bash(git add:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
