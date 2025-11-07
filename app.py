@@ -11,8 +11,9 @@ from functools import wraps
 import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'military_fitness_secret_2024'
-socketio = SocketIO(app, cors_allowed_origins="*")
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'military_fitness_secret_2024')
+# Use threading mode instead of eventlet for better compatibility
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 # Setup Flask-Login
 login_manager = LoginManager()
