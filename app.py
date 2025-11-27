@@ -12,8 +12,8 @@ import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'military_fitness_secret_2024')
-# Use eventlet for production deployment with gunicorn
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
+# Use gevent for production deployment with gunicorn (Python 3.13 compatible)
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='gevent')
 
 # Setup Flask-Login
 login_manager = LoginManager()
