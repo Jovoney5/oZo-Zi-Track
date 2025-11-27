@@ -6,7 +6,9 @@
       "Bash(cat:*)",
       "Bash(git commit:*)",
       "Bash(git add:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(sqlite3:*)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "ask": []

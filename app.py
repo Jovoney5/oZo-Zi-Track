@@ -244,31 +244,39 @@ def generate_soldier_vitals(soldier_id):
     prev = soldier_vitals[soldier_id]
 
     # Define target ranges based on activity
+    # Note: Updates happen every 2.5 seconds, so step increments are for 2.5 second intervals
     if activity_level == 'resting':
         target_hr = random.randint(65, 75)
-        step_increment = random.randint(0, 2)
+        # Resting: 0-1 steps every 2.5 seconds (occasional movement like getting up briefly)
+        # 90% of the time no steps, 10% of the time 1-2 steps
+        step_increment = random.choices([0, 1, 2], weights=[85, 10, 5])[0]
         calorie_increment = random.randint(0, 1)
         target_temp = 36.6
         target_hydration = 85
         target_fatigue = 15
     elif activity_level == 'walking':
         target_hr = random.randint(90, 105)
-        step_increment = random.randint(8, 12)
-        calorie_increment = random.randint(2, 4)
+        # Walking: ~2 steps per second = 5 steps per 2.5 seconds
+        # 120 steps per minute = realistic walking pace
+        step_increment = random.randint(4, 6)
+        calorie_increment = random.randint(1, 2)
         target_temp = 36.9
         target_hydration = 75
         target_fatigue = 30
     elif activity_level == 'running':
         target_hr = random.randint(130, 150)
-        step_increment = random.randint(20, 30)
-        calorie_increment = random.randint(5, 8)
+        # Running: ~3.5 steps per second = 8-9 steps per 2.5 seconds
+        # 180-200 steps per minute = realistic running pace
+        step_increment = random.randint(8, 10)
+        calorie_increment = random.randint(3, 5)
         target_temp = 37.4
         target_hydration = 60
         target_fatigue = 65
     else:  # training
         target_hr = random.randint(140, 165)
-        step_increment = random.randint(15, 25)
-        calorie_increment = random.randint(6, 10)
+        # Training: mix of running and exercises = ~2.5-3 steps per second
+        step_increment = random.randint(6, 8)
+        calorie_increment = random.randint(3, 5)
         target_temp = 37.6
         target_hydration = 55
         target_fatigue = 70
@@ -457,6 +465,50 @@ def get_unit_summary():
         'avg_hydration': random.randint(60, 85)
     }
     return jsonify(summary)
+
+
+@app.route('/api/search_soldiers')
+@login_required
+def search_soldiers():
+    query = request.args.get('q', '').lower()
+    if not query:
+        return jsonify([])
+
+    soldiers = get_soldiers_from_db()
+    results = []
+
+    for soldier in soldiers:
+        # Search by ID, name, or first letters
+        if (str(soldier['id']) == query or
+            query in soldier['name'].lower() or
+            soldier['name'].lower().startswith(query)):
+            results.append(soldier)
+
+    return jsonify(results[:10])  # Limit to 10 results
+
+
+@app.route('/api/update_soldier_position', methods=['POST'])
+@role_required(['Commander', 'Sergeant'])
+def update_soldier_position_api():
+    data = request.get_json()
+    soldier_id = data.get('soldier_id')
+    lat = data.get('lat')
+    lng = data.get('lng')
+
+    if not soldier_id or lat is None or lng is None:
+        return jsonify({'error': 'Missing required fields'}), 400
+
+    conn = sqlite3.connect('jdf_tracker.db')
+    c = conn.cursor()
+    c.execute('UPDATE soldiers SET lat = ?, lng = ? WHERE id = ?', (float(lat), float(lng), soldier_id))
+    conn.commit()
+    conn.close()
+
+    # Update in-memory position
+    if soldier_id in soldier_positions:
+        soldier_positions[soldier_id] = {'lat': float(lat), 'lng': float(lng)}
+
+    return jsonify({'success': True, 'message': 'Position updated'})
 
 
 # WebSocket events for real-time updates
