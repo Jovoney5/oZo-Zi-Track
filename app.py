@@ -12,8 +12,8 @@ import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'military_fitness_secret_2024')
-# Use threading mode instead of eventlet for better compatibility
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+# Use eventlet for production deployment with gunicorn
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
 # Setup Flask-Login
 login_manager = LoginManager()
