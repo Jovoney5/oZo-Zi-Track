@@ -123,6 +123,9 @@ last_activity_change = {}
 soldier_positions = {}
 # Store previous vitals for smooth transitions
 soldier_vitals = {}
+# Track step updates for pausing mechanism
+last_step_update = {}
+step_pause_until = {}
 
 # Initialize soldier states and positions from database
 def initialize_soldier_states():
@@ -245,41 +248,56 @@ def generate_soldier_vitals(soldier_id):
 
     # Define target ranges based on activity
     # Note: Updates happen every 2.5 seconds, so step increments are for 2.5 second intervals
+    # Steps now move MUCH slower - like counting seconds pace
     if activity_level == 'resting':
         target_hr = random.randint(65, 75)
-        # Resting: 0-1 steps every 2.5 seconds (occasional movement like getting up briefly)
-        # 90% of the time no steps, 10% of the time 1-2 steps
-        step_increment = random.choices([0, 1, 2], weights=[85, 10, 5])[0]
+        # Resting: almost no steps - very occasional movement
+        step_increment = random.choices([0, 1], weights=[95, 5])[0]
         calorie_increment = random.randint(0, 1)
         target_temp = 36.6
         target_hydration = 85
         target_fatigue = 15
     elif activity_level == 'walking':
         target_hr = random.randint(90, 105)
-        # Walking: ~2 steps per second = 5 steps per 2.5 seconds
-        # 120 steps per minute = realistic walking pace
-        step_increment = random.randint(4, 6)
-        calorie_increment = random.randint(1, 2)
+        # Walking: very slow - about 1 step every 2-3 seconds
+        step_increment = random.choices([0, 1], weights=[40, 60])[0]
+        calorie_increment = random.randint(0, 1)
         target_temp = 36.9
         target_hydration = 75
         target_fatigue = 30
     elif activity_level == 'running':
         target_hr = random.randint(130, 150)
-        # Running: ~3.5 steps per second = 8-9 steps per 2.5 seconds
-        # 180-200 steps per minute = realistic running pace
-        step_increment = random.randint(8, 10)
-        calorie_increment = random.randint(3, 5)
+        # Running: slow increments - about 1 step per second
+        step_increment = random.choices([0, 1, 2], weights=[20, 60, 20])[0]
+        calorie_increment = random.randint(1, 2)
         target_temp = 37.4
         target_hydration = 60
         target_fatigue = 65
     else:  # training
         target_hr = random.randint(140, 165)
-        # Training: mix of running and exercises = ~2.5-3 steps per second
-        step_increment = random.randint(6, 8)
-        calorie_increment = random.randint(3, 5)
+        # Training: moderate slow increments
+        step_increment = random.choices([0, 1, 2], weights=[30, 50, 20])[0]
+        calorie_increment = random.randint(1, 2)
         target_temp = 37.6
         target_hydration = 55
         target_fatigue = 70
+
+    # Implement pause mechanism: pause for 5 seconds every 60 seconds
+    current_time = datetime.now()
+    if soldier_id not in last_step_update:
+        last_step_update[soldier_id] = current_time
+        step_pause_until[soldier_id] = None
+
+    # Check if we should start a pause (every 60 seconds)
+    time_since_last_update = (current_time - last_step_update[soldier_id]).total_seconds()
+    if time_since_last_update >= 60 and (step_pause_until[soldier_id] is None or current_time > step_pause_until[soldier_id]):
+        # Start a 5-second pause
+        step_pause_until[soldier_id] = current_time + timedelta(seconds=5)
+        last_step_update[soldier_id] = current_time
+
+    # If we're in a pause period, don't increment steps
+    if step_pause_until[soldier_id] and current_time < step_pause_until[soldier_id]:
+        step_increment = 0
 
     # Gradually move towards target values (smooth transitions)
     heart_rate = prev['heart_rate'] + (target_hr - prev['heart_rate']) * 0.15
