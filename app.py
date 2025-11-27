@@ -299,9 +299,9 @@ def generate_soldier_vitals(soldier_id):
     if step_pause_until[soldier_id] and current_time < step_pause_until[soldier_id]:
         step_increment = 0
 
-    # Gradually move towards target values (smooth transitions)
-    heart_rate = prev['heart_rate'] + (target_hr - prev['heart_rate']) * 0.15
-    heart_rate = int(heart_rate + random.randint(-2, 2))  # Small random variation
+    # Heart rate transitions faster than before for more responsive changes
+    heart_rate = prev['heart_rate'] + (target_hr - prev['heart_rate']) * 0.35
+    heart_rate = int(heart_rate + random.randint(-3, 3))  # More variation for realistic fluctuation
 
     # Accumulate steps and calories
     steps = prev['steps'] + step_increment
